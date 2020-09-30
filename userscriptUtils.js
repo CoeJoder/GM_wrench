@@ -32,7 +32,13 @@ function UserscriptUtils() {
     }
 
     /**
-     * Add a new <link> stylesheet at the given URL to the <head>.
+     * Add a new stylesheet <link> to the <head>.
+     *
+     * Usage example:
+     *
+     * utils.addStylesheet('https://fonts.googleapis.com/css?family=Open+Sans');
+     *
+     * @param {string} href - The URL of the stylesheet.
      */
     UserscriptUtils.prototype.addStylesheet = function(href) {
         var link = document.createElement('link');

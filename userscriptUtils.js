@@ -4,7 +4,7 @@
  * @class
  */
 function UserscriptUtils() {
-	var that = this;
+    var that = this;
 
     /**
      * Add a new <style> with the given text to the <head>.
@@ -61,42 +61,42 @@ function UserscriptUtils() {
      * @param {number}            [interval=300]     - The time (ms) to wait between iterations.
      * @param {number}            [maxIntervals=-1]  - The max number of intervals to run (negative number for unlimited).
      */
-	UserscriptUtils.prototype.waitForKeyElements = function(selectorOrFunction, callback, waitOnce, interval, maxIntervals) {
-		if (typeof waitOnce === "undefined") {
-			waitOnce = true;
-		}
-		if (typeof interval === "undefined") {
-			interval = 300;
-		}
-		if (typeof maxIntervals === "undefined") {
-			maxIntervals = -1;
-		}
-		var targetNodes = (typeof selectorOrFunction === "function")
-				? selectorOrFunction()
-				: document.querySelectorAll(selectorOrFunction);
+    UserscriptUtils.prototype.waitForKeyElements = function(selectorOrFunction, callback, waitOnce, interval, maxIntervals) {
+        if (typeof waitOnce === "undefined") {
+            waitOnce = true;
+        }
+        if (typeof interval === "undefined") {
+            interval = 300;
+        }
+        if (typeof maxIntervals === "undefined") {
+            maxIntervals = -1;
+        }
+        var targetNodes = (typeof selectorOrFunction === "function")
+                ? selectorOrFunction()
+                : document.querySelectorAll(selectorOrFunction);
 
-		var targetsFound = targetNodes && targetNodes.length > 0;
-		if (targetsFound) {
-			targetNodes.forEach(function(targetNode) {
-				var attrAlreadyFound = "data-userscript-alreadyFound";
-				var alreadyFound = targetNode.getAttribute(attrAlreadyFound) || false;
-				if (!alreadyFound) {
-					var cancelFound = callback(targetNode);
-					if (cancelFound) {
-						targetsFound = false;
-					}
-					else {
-						targetNode.setAttribute(attrAlreadyFound, true);
-					}
-				}
-			});
-		}
+        var targetsFound = targetNodes && targetNodes.length > 0;
+        if (targetsFound) {
+            targetNodes.forEach(function(targetNode) {
+                var attrAlreadyFound = "data-userscript-alreadyFound";
+                var alreadyFound = targetNode.getAttribute(attrAlreadyFound) || false;
+                if (!alreadyFound) {
+                    var cancelFound = callback(targetNode);
+                    if (cancelFound) {
+                        targetsFound = false;
+                    }
+                    else {
+                        targetNode.setAttribute(attrAlreadyFound, true);
+                    }
+                }
+            });
+        }
 
-		if (maxIntervals !== 0 && !(targetsFound && waitOnce)) {
-			maxIntervals -= 1;
-			setTimeout(function() {
-				that.waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals);
-			}, interval);
-		}
-	}
+        if (maxIntervals !== 0 && !(targetsFound && waitOnce)) {
+            maxIntervals -= 1;
+            setTimeout(function() {
+                that.waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals);
+            }, interval);
+        }
+    }
 }

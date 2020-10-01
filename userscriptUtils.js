@@ -1,17 +1,17 @@
 /**
- * A utility class for for userscripts.
+ * Constructor.
  *
  * @class
+ * @classdesc A collection of common utilities for implementing userscripts.
  */
 function UserscriptUtils() {
-    var that = this;
+    var self = this;
 
     /**
-     * Add a new <style> with the given text to the <head>.
+     * Add a new `<style>` with the given text to the `<head>`.
      *
-     * Usage example:
-     *
-     * utils.addCss(`
+     * @example
+     * userscriptUtils.addCss(`
      *     p {
      *         height: 50px;
      *     }
@@ -29,14 +29,13 @@ function UserscriptUtils() {
             style.appendChild(document.createTextNode(css));
         }
         document.getElementsByTagName('head')[0].appendChild(style);
-    }
+    };
 
     /**
-     * Add a new stylesheet <link> to the <head>.
+     * Add a new stylesheet `<link>` to the `<head>`.
      *
-     * Usage example:
-     *
-     * utils.addStylesheet('https://fonts.googleapis.com/css?family=Open+Sans');
+     * @example
+     * userscriptUtils.addStylesheet('https://fonts.googleapis.com/css?family=Open+Sans');
      *
      * @param {string} href - The URL of the stylesheet.
      */
@@ -45,20 +44,24 @@ function UserscriptUtils() {
         link.rel = 'stylesheet';
         link.href = href;
         document.getElementsByTagName('head')[0].appendChild(link);
-    }
+    };
 
     /**
      * Detect and handle AJAXed content.
      *
-     * Usage example:
+     * @example
+     * userscriptUtils.waitForKeyElements("div.comments", (element) => {
+     *   element.innerHTML = "This text inserted by waitForKeyElements().";
+     * });
      *
-     * function callback(domElement) {
-     *     domElement.innerHTML = "This text inserted by waitForKeyElements().";
-     * }
-     *
-     * utils.waitForKeyElements("div.comments", callback);
-     * // or
-     * utils.waitForKeyElements(selectorFunction, callback);
+     * userscriptUtils.waitForKeyElements(() => {
+     *   const iframe = document.querySelector('iframe');
+     *   if (iframe) {
+     *     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+     *     return iframeDoc.querySelectorAll("div.comments");
+     *   }
+     *   return null;
+     * }, callbackFunc);
      *
      * @param {(string|function)} selectorOrFunction - The selector string or function.
      * @param {function}          callback           - The callback function; takes a single DOM element as parameter.
@@ -101,8 +104,8 @@ function UserscriptUtils() {
         if (maxIntervals !== 0 && !(targetsFound && waitOnce)) {
             maxIntervals -= 1;
             setTimeout(function() {
-                that.waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals);
+                self.waitForKeyElements(selectorOrFunction, callback, waitOnce, interval, maxIntervals);
             }, interval);
         }
-    }
+    };
 }

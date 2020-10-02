@@ -1,12 +1,13 @@
 <a name="UserscriptUtils"></a>
 
 ## UserscriptUtils
-A collection of common utilities for implementing userscripts.
+A collection of common utilities for implementing userscripts.  Some methods are adapted from the           [selenium-webdriver](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/)           project.
 
 **Kind**: global class  
 
 * [UserscriptUtils](#UserscriptUtils)
     * [new UserscriptUtils()](#new_UserscriptUtils_new)
+    * [.sleep(ms)](#UserscriptUtils+sleep) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.addCss(css)](#UserscriptUtils+addCss)
     * [.addStylesheet(href)](#UserscriptUtils+addStylesheet)
     * [.waitForKeyElements(selectorOrFunction, callback, [waitOnce], [interval], [maxIntervals])](#UserscriptUtils+waitForKeyElements)
@@ -16,6 +17,23 @@ A collection of common utilities for implementing userscripts.
 ### new UserscriptUtils()
 Constructor.
 
+<a name="UserscriptUtils+sleep"></a>
+
+### userscriptUtils.sleep(ms) ⇒ <code>Promise.&lt;void&gt;</code>
+Sleep for the given amount of time.
+
+**Kind**: instance method of [<code>UserscriptUtils</code>](#UserscriptUtils)  
+**Returns**: <code>Promise.&lt;void&gt;</code> - A promise that will be resolved when the sleep has finished.  
+**See**: [webdriver.sleep](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#sleep)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| ms | <code>number</code> | The amount of time, in milliseconds, to sleep. |
+
+**Example**  
+```js
+await userscriptUtils.sleep(2000);
+```
 <a name="UserscriptUtils+addCss"></a>
 
 ### userscriptUtils.addCss(css)
@@ -56,7 +74,7 @@ Detect and handle AJAXed content.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | selectorOrFunction | <code>string</code> \| <code>function</code> |  | The selector string or function. |
-| callback | <code>function</code> |  | The callback function; takes a single DOM element as parameter.                                                 If returns true, element will be processed again on subsequent iterations. |
+| callback | <code>function</code> |  | The callback function; takes a single DOM element as parameter.                                               If returns true, element will be processed again on subsequent iterations. |
 | [waitOnce] | <code>boolean</code> | <code>true</code> | Whether to stop after the first elements are found. |
 | [interval] | <code>number</code> | <code>300</code> | The time (ms) to wait between iterations. |
 | [maxIntervals] | <code>number</code> | <code>-1</code> | The max number of intervals to run (negative number for unlimited). |

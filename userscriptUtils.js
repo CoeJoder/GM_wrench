@@ -40,8 +40,7 @@ function UserscriptUtils() {
         style.type ='text/css';
         if (style.styleSheet) {
             style.styleSheet.cssText = css;
-        }
-        else {
+        } else {
             style.appendChild(document.createTextNode(css));
         }
         document.getElementsByTagName('head')[0].appendChild(style);
@@ -61,6 +60,112 @@ function UserscriptUtils() {
         link.href = href;
         document.getElementsByTagName('head')[0].appendChild(link);
     };
+
+    /**
+     * Resolves a wait message from either a function or a string.
+     *
+     * @private
+     * @param {(string|Function)=} message An optional message to use if the wait times out.
+     * @return {string}                    The resolved message.
+     * @see {@link https://github.com/SeleniumHQ/selenium/blob/d912be8f325d3bed9758140b50599ee0619f1929/javascript/node/selenium-webdriver/lib/webdriver.js#L221|webdriver.resolveWaitMessage}
+     */
+    function resolveWaitMessage(message) {
+        return message
+            ? `${typeof message === 'function' ? message() : message}\n`
+            : '';
+    }
+
+    /**
+     * Determines whether a {@code value} should be treated as a promise.
+     * Any object whose "then" property is a function will be considered a promise.
+     *
+     * @private
+     * @param {?} value The value to test.
+     * @return {boolean} Whether the value is a promise.
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/promise.html#isPromise|isPromise}
+     */
+    function isPromise(value) {
+        try {
+            return (value && (typeof value === 'object' || typeof value === 'function')
+                    && typeof value['then'] === 'function');
+        } catch (ex) {
+            return false
+        }
+    }
+
+    this.wait = function(condition, timeout = 0, message = undefined, pollTimeout = 200) {
+        if (typeof timeout !== 'number' || timeout < 0) {
+            throw TypeError('timeout must be a number >= 0: ' + timeout);
+        }
+        if (typeof pollTimeout !== 'number' || pollTimeout < 0) {
+            throw TypeError('pollTimeout must be a number >= 0: ' + pollTimeout);
+        }
+
+        if (isPromise(condition)) {
+            return new Promise((resolve, reject) => {
+                if (!timeout) {
+                    resolve(condition);
+                    return;
+                }
+                let start = Date.now();
+                let timer = setTimeout(function () {
+                    timer = null
+                    try {
+                        let timeoutMessage = resolveWaitMessage(message);
+                        reject(new UserscriptUtils.TimeoutError(`${timeoutMessage}Timed out waiting for promise to resolve after ${Date.now() - start}ms`));
+                    } catch (ex) {
+                        reject(new UserscriptUtils.TimeoutError(`${ex.message}\nTimed out waiting for promise to resolve after ${Date.now() - start}ms`));
+                    }
+                }, timeout);
+                const clearTimer = () => timer && clearTimeout(timer);
+
+                condition.then(function (value) {
+                    clearTimer();
+                    resolve(value);
+                },
+                function (error) {
+                    clearTimer();
+                    reject(error);
+                });
+            });
+        }
+
+        if (typeof fn !== 'function') {
+            throw TypeError('Wait condition must be a promise-like object or a function');
+        }
+
+        function evaluateCondition() {
+            return new Promise((resolve, reject) => {
+                try {
+                    resolve(fn(self));
+                } catch (ex) {
+                    reject(ex);
+                }
+            });
+        }
+        let result = new Promise((resolve, reject) => {
+            const startTime = Date.now();
+            const pollCondition = async () => {
+                evaluateCondition().then(function (value) {
+                    const elapsed = Date.now() - startTime;
+                    if (value) {
+                        resolve(value);
+                    } else if (timeout && elapsed >= timeout) {
+                        try {
+                            let timeoutMessage = resolveWaitMessage(message);
+                            reject(new UserscriptUtils.TimeoutError(`${timeoutMessage}Wait timed out after ${elapsed}ms`));
+                        } catch (ex) {
+                            reject(new UserscriptUtils.TimeoutError(`${ex.message}\nWait timed out after ${elapsed}ms`));
+                        }
+                    } else {
+                        setTimeout(pollCondition, pollTimeout);
+                    }
+                }, reject);
+            };
+            pollCondition();
+        });
+        return result;
+    }
 
     /**
      * Detect and handle AJAXed content.

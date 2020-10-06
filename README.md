@@ -10,11 +10,10 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
 
 ## Usage
 ```js
-const utils = new UserscriptUtils();
-utils.addCss(`
+GM_wrench.addCss(`
     p {
         height: 50px;
     }
 `);
 ```
-See full API [here](api.md).
+See full API [here](docs/api.md).

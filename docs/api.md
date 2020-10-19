@@ -12,7 +12,7 @@ A collection of common utilities for implementing userscripts.  Some methods are
     * [.waitForKeyElements(selectorOrFunction, callback, [waitOnce], [interval], [maxIntervals])](#GM_wrench.waitForKeyElements)
     * [.Waiter](#GM_wrench.Waiter)
         * [new Waiter([input], [timeout], [pollTimeout], [message])](#new_GM_wrench.Waiter_new)
-        * [.Waiter#wait(condition)](#GM_wrench.Waiter.Waiter+wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code>
+        * [.wait(condition)](#GM_wrench.Waiter+wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code>
     * [.By](#GM_wrench.By)
         * [new By(using, value)](#new_GM_wrench.By_new)
         * [.css(selector)](#GM_wrench.By.css) ⇒ <code>By</code>
@@ -101,11 +101,11 @@ GM_wrench.waitForKeyElements("div.comments", (element) => {  element.innerHTML 
 Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a[Condition](#GM_wrench.Condition), as a custom function, or as any promise-like thenable.For a [Condition](#GM_wrench.Condition) or function, the wait will repeatedly evaluate the condition until it returns a truthyvalue. If any errors occur while evaluating the condition, they will be allowed to propagate. In the event acondition returns a Promise, the polling loop will wait for it to be resolved and use the resolved value forwhether the condition has been satisfied. The resolution time for a promise is always factored into whether await has timed out.If the provided condition is a [HTMLElementCondition](#GM_wrench.HTMLElementCondition), then the wait will return a[HTMLElementPromise](#GM_wrench.HTMLElementPromise) that will resolve to the element that satisfied the condition.
 
 **Kind**: static class of [<code>GM\_wrench</code>](#GM_wrench)  
-**See**: [FluentWait](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html)  
+**See**: [webdriver.FluentWait](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html)  
 
 * [.Waiter](#GM_wrench.Waiter)
     * [new Waiter([input], [timeout], [pollTimeout], [message])](#new_GM_wrench.Waiter_new)
-    * [.Waiter#wait(condition)](#GM_wrench.Waiter.Waiter+wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code>
+    * [.wait(condition)](#GM_wrench.Waiter+wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code>
 
 <a name="new_GM_wrench.Waiter_new"></a>
 
@@ -131,12 +131,12 @@ Waits for a condition to evaluate to a "truthy" value. The condition may be spec
     button.click();
 })(GM_wrench);
 ```
-<a name="GM_wrench.Waiter.Waiter+wait"></a>
+<a name="GM_wrench.Waiter+wait"></a>
 
-#### Waiter.Waiter#wait(condition) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code>
+#### waiter.wait(condition) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code>
 Wait for condition to be satisfied.
 
-**Kind**: static method of [<code>Waiter</code>](#GM_wrench.Waiter)  
+**Kind**: instance method of [<code>Waiter</code>](#GM_wrench.Waiter)  
 **Returns**: <code>Promise.&lt;V&gt;</code> \| <code>HTMLElementPromise</code> - A promise that will be resolved with the first truthy value returned     by the condition function, or rejected if the condition times out. If the input input condition is an     instance of a [HTMLElementCondition](#GM_wrench.HTMLElementCondition), the returned value will be a [HTMLElementPromise](#GM_wrench.HTMLElementPromise).  
 **Throws**:
 

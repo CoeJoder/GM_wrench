@@ -184,7 +184,7 @@ const GM_wrench = {};
      * @template T,V
      * @class
      * @memberof GM_wrench
-     * @see {@link https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html|FluentWait}
+     * @see {@link https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html|webdriver.FluentWait}
      *
      * @param {T}                 [input]             The input value to pass to the evaluated conditions. 
      * @param {number}            [timeout=0]         The duration in milliseconds, how long to wait for the condition to be true.
@@ -202,7 +202,6 @@ const GM_wrench = {};
     /**
      * Wait for condition to be satisfied.
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#wait|webdriver.wait}
-     * @memberof GM_wrench.Waiter
      *
      * @param {!(PromiseLike<V>|Condition<T, V>|function(T): V)} condition The condition to wait on, defined as a promise,
      *      {@link GM_wrench.Condition} object, or a function to evaluate as a condition.

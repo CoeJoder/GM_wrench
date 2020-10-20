@@ -166,8 +166,8 @@ const GM_wrench = {};
      * whether the condition has been satisfied. The resolution time for a promise is always factored into whether a
      * wait has timed out.
      *
-     * If the provided condition is a {@link GM_wrench.HTMLElementCondition}, then the wait will return a
-     * {@link GM_wrench.HTMLElementPromise} that will resolve to the element that satisfied the condition.
+     * If the provided condition is an {@link GM_wrench.ElementCondition}, then the wait will return a
+     * {@link GM_wrench.ElementPromise} that will resolve to the element that satisfied the condition.
      *
      * @example <caption>Waiting up to 10 seconds for text to appear, then wait up to 3 seconds for an element.</caption>
      * (async ({Waiter, until, By}) => {
@@ -205,9 +205,9 @@ const GM_wrench = {};
      *
      * @param {!(PromiseLike<V>|Condition<T, V>|function(T): V)} condition The condition to wait on, defined as a promise,
      *      {@link GM_wrench.Condition} object, or a function to evaluate as a condition.
-     * @return {!(Promise<V>|HTMLElementPromise)} A promise that will be resolved with the first truthy value returned
+     * @return {!(Promise<V>|ElementPromise)} A promise that will be resolved with the first truthy value returned
      *      by the condition function, or rejected if the condition times out. If the input input condition is an
-     *      instance of a {@link GM_wrench.HTMLElementCondition}, the returned value will be a {@link GM_wrench.HTMLElementPromise}.
+     *      instance of an {@link GM_wrench.ElementCondition}, the returned value will be an {@link GM_wrench.ElementPromise}.
      * @throws {TypeError} if the provided `condition` is not a valid type.
      */
     Waiter.prototype.wait = function (condition) {
@@ -276,7 +276,7 @@ const GM_wrench = {};
                 }
             });
         }
-        let result = new Promise((resolve, reject) => {
+        let pResult = new Promise((resolve, reject) => {
             const startTime = Date.now();
             const pollCondition = async () => {
                 evaluateCondition().then(function (value) {
@@ -297,15 +297,15 @@ const GM_wrench = {};
             };
             pollCondition();
         });
-        if (condition instanceof HTMLElementCondition) {
-            result = /** @type Promise<*> */ (new HTMLElementPromise(result.then(function (value) {
-                if (!(value instanceof HTMLElement)) {
-                    throw TypeError('HTMLElementCondition did not resolve to a HTMLElement: ' + Object.prototype.toString.call(value));
+        if (condition instanceof ElementCondition) {
+            return new ElementPromise(pResult.then(function (value) {
+                if (!(value instanceof Element)) {
+                    throw TypeError('ElementCondition did not resolve to a Element: ' + Object.prototype.toString.call(value));
                 }
                 return value;
-            })));
+            }));
         }
-        return result;
+        return pResult;
     };
     
     /**
@@ -375,45 +375,44 @@ const GM_wrench = {};
     };
 
     /**
-     * @classdesc Defines a condition that will result in a {@link HTMLElement}.
+     * @classdesc Defines a condition that will result in an {@link Element}.
      * @class
      * @extends {Condition}
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebElementCondition.html|webdriver.WebElementCondition}
      *
      * @param {string} message A descriptive error message. Should complete the sentence "Waiting [...]".
-     * @param {function(!(Document|HTMLElement)): !(HTMLElement|Promise<!HTMLElement>)} fn The condition function to
+     * @param {function(!ParentNode): !(Element|Promise<!Element>)} fn The condition function to
      *      evaluate on each iteration of the wait loop.
      */
-    function HTMLElementCondition(message, fn) {
+    function ElementCondition(message, fn) {
         Condition.call(this, message, fn);
     }
-    inheritType(HTMLElementCondition, Condition);
-    GM_wrench.HTMLElementCondition = HTMLElementCondition;
+    inheritType(ElementCondition, Condition);
+    GM_wrench.ElementCondition = ElementCondition;
 
     /**
-     * @classdesc A promise that will be fulfilled with a HTMLElement.
+     * @classdesc A promise that will be fulfilled with an Element.
      * @class
-     * @extends {HTMLElement}
-     * @implements {Promise<HTMLElement>}
+     * @extends {Element}
+     * @implements {Promise<Element>}
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebElementPromise.html}
      * 
-     * @param {!Promise<!HTMLElement>} el A promise that will resolve to the promised element.
+     * @param {!Promise<!Element>} el A promise that will resolve to the promised element.
      */
-    function HTMLElementPromise(el) {
+    function ElementPromise(el) {
         this.then = el.then.bind(el);
         this.catch = el.catch.bind(el);
     }
-    inheritType(HTMLElementPromise, HTMLElement);
-    GM_wrench.HTMLElementPromise = HTMLElementPromise;
+    inheritType(ElementPromise, Element);
+    GM_wrench.ElementPromise = ElementPromise;
 
     /**
      * @classdesc An operation did not complete before its timeout expired.
      * @class
      * @extends Error
      * @memberof GM_wrench
-     * @hideconstructor
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/error_exports_TimeoutError.html|webdriver.TimeoutError}
      *
      * @param {string} [opt_error] The error message, if any.
@@ -461,10 +460,10 @@ const GM_wrench = {};
         /**
          * @private
          * 
-         * @param {!(Document|HTMLElement)} context       The search context.
+         * @param {!ParentNode} context                   The search context.
          * @param {!string} using                         The name of the location strategy to use.
          * @param {!string} value                         The value to search for.
-         * @returns {!Promise<!NodeListOf<!HTMLElement>>} A promise that will resolve to an array-like collection of HTMLElements.
+         * @returns {!Promise<!NodeListOf<!Element>>} A promise that will resolve to an array-like collection of Elements.
          */
         findElements: async function (context, using, value) {
             switch (using) {
@@ -475,7 +474,7 @@ const GM_wrench = {};
     };
 
     /**
-     * Defines common conditions for use with {@link GM_wrench#wait}.
+     * Defines common conditions for use with {@link GM_wrench.Waiter}.
      * @namespace
      */
     GM_wrench.until = {};
@@ -487,20 +486,20 @@ const GM_wrench = {};
      * @private
      *
      * @param {!(By|Function)} locator               The locator to use.
-     * @param {!(Document|HTMLElement)} context      The search context.
-     * @return {!(Promise<!ArrayLike<HTMLElement>>)} A promise that will resolve to an array-like collection of HTMLElements.
+     * @param {!ParentNode} context      The search context.
+     * @return {!(Promise<!ArrayLike<Element>>)} A promise that will resolve to an array-like collection of Elements.
      */
     async function findElements(locator, context = document) {
         locator = checkLocator(locator);
         let result;
         if (typeof locator === 'function') {
             result = await locator(context);
-            if (result instanceof HTMLElement) {
+            if (result instanceof Element) {
                 result = [result];
             }
             else if (Array.isArray(result)) {
                 result = result.filter(function (item) {
-                    return item instanceof HTMLElement;
+                    return item instanceof Element;
                 });
             }
             else {
@@ -517,17 +516,16 @@ const GM_wrench = {};
      * Creates a condition that will loop until an element is found with the given locator.
      *
      * @param {!(By|Function)} locator The locator to use.
-     * @return {!HTMLElementCondition} The new condition.
+     * @return {!ElementCondition} The new condition.
      */
     GM_wrench.until.elementLocated = function (locator) {
         locator = checkLocator(locator);
         let locatorStr = (typeof locator === 'function') ? 'by function()' : locator + '';
-        return new HTMLElementCondition(
+        return new ElementCondition(
             'for element to be located ' + locatorStr,
-            function (context) {
-                return findElements(locator, context).then(function (elements) {
-                    return elements[0];
-                });
+            async function (context) {
+                const elements = await findElements(locator, context);
+                return elements[0];
             }
         );
     }
@@ -535,18 +533,17 @@ const GM_wrench = {};
     /**
      * Creates a condition that will loop until at least one element is found with the given locator.
      *
-     * @param {!(By|Function)} locator                                                    The locator to use.
-     * @return {!Condition<!(Document|HTMLElement), !(Promise<!ArrayLike<HTMLElement>>)>} The new condition.
+     * @param {!(By|Function)} locator                                        The locator to use.
+     * @return {!Condition<!ParentNode, !(Promise<!ArrayLike<Element>>)>} The new condition.
      */
     GM_wrench.until.elementsLocated = function (locator) {
         locator = checkLocator(locator);
         let locatorStr = (typeof locator === 'function') ? 'by function()' : locator + '';
         return new Condition(
             'for at least one element to be located ' + locatorStr,
-            function (context) {
-                return findElements(locator, context).then(function (elements) {
-                    return elements.length > 0 ? elements : null;
-                });
+            async function (context) {
+                const elements = await findElements(locator, context);
+                return elements.length > 0 ? elements : null;
             }
         );
     }

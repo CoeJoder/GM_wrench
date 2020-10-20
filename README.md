@@ -16,4 +16,4 @@ GM_wrench.addCss(`
     }
 `);
 ```
-See full API [here](docs/api.md).
+See full API [here](api.md).

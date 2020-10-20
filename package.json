@@ -1,0 +1,27 @@
+{
+  "name": "gm_wrench",
+  "version": "1.0.0",
+  "description": "GM_wrench build script.",
+  "scripts": {
+    "prepublish": "run-s docs minify",
+    "minify": "google-closure-compiler --js=userscriptUtils.js --js_output_file=userscriptUtils.min.js",
+    "docs": "node ./scripts/generateDocs.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoeJoder/userscriptUtils.js.git"
+  },
+  "author": "CoeJoder",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CoeJoder/userscriptUtils.js/issues"
+  },
+  "homepage": "https://github.com/CoeJoder/userscriptUtils.js#readme",
+  "devDependencies": {
+    "jsdoc-to-markdown": "^6.0.1",
+    "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "google-closure-compiler": "^20201006.0.0"
+  }
+}

@@ -1,10 +1,14 @@
 // @ts-check
 
 /**
- * A collection of common utilities for implementing userscripts.  Some methods are adapted from the
- * {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/|selenium-webdriver} project.
+ * @example
+ * (async ({Waiter, until, By}) => {
+ *     await new Waiter(document)
+ *             .wait(until.elementLocated(By.css("button")));
+ *             .click();
+ * })(GM_wrench);
  */
-const GM_wrench = {};
+var GM_wrench = GM_wrench || {};
 (() => {
     'use strict'
 
@@ -129,6 +133,7 @@ const GM_wrench = {};
      * Resolves a wait message from either a function or a string.
      * @private
      * @see {@link https://github.com/SeleniumHQ/selenium/blob/d912be8f325d3bed9758140b50599ee0619f1929/javascript/node/selenium-webdriver/lib/webdriver.js#L221|webdriver.resolveWaitMessage}
+     * @category selenium-webdriver
      *
      * @param {(string|Function)} [message] An optional message to use if the wait times out.
      * @return {string}                     The resolved message.
@@ -144,6 +149,7 @@ const GM_wrench = {};
      * function will be considered a promise.
      * @private
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/promise.html#isPromise|isPromise}
+     * @category selenium-webdriver
      *
      * @param {*} value  The value to test.
      * @return {boolean} Whether the value is a promise.
@@ -185,6 +191,7 @@ const GM_wrench = {};
      * @class
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html|webdriver.FluentWait}
+     * @category selenium-webdriver
      *
      * @param {T}                 [input]             The input value to pass to the evaluated conditions. 
      * @param {number}            [timeout=0]         The duration in milliseconds, how long to wait for the condition to be true.
@@ -202,6 +209,7 @@ const GM_wrench = {};
     /**
      * Wait for condition to be satisfied.
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#wait|webdriver.wait}
+     * @category selenium-webdriver
      *
      * @param {!(PromiseLike<V>|Condition<T, V>|function(T): V)} condition The condition to wait on, defined as a promise,
      *      {@link GM_wrench.Condition} object, or a function to evaluate as a condition.
@@ -326,6 +334,7 @@ const GM_wrench = {};
      * @class
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html|webdriver.By}
+     * @category selenium-webdriver
      * 
      * @param {string} using The name of the location strategy to use.
      * @param {string} value The value to search for.
@@ -342,7 +351,8 @@ const GM_wrench = {};
     /**
      * Locates elements using a CSS selector.
      * @static
-     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.css|By.css}
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.css|webdriver.By.css}
+     * @category selenium-webdriver
      * 
      * @param {string} selector The CSS selector to use.
      * @return {!By}            The new locator.
@@ -356,6 +366,7 @@ const GM_wrench = {};
      * @class
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_Condition.html|webdriver.Condition}
+     * @category selenium-webdriver
      *
      * @template T,V
      * @param {string}       message A descriptive error message. Should complete the sentence "Waiting [...]".
@@ -380,6 +391,7 @@ const GM_wrench = {};
      * @extends {Condition}
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebElementCondition.html|webdriver.WebElementCondition}
+     * @category selenium-webdriver
      *
      * @param {string} message A descriptive error message. Should complete the sentence "Waiting [...]".
      * @param {function(!ParentNode): !(Element|Promise<!Element>)} fn The condition function to
@@ -397,7 +409,8 @@ const GM_wrench = {};
      * @extends {Element}
      * @implements {Promise<Element>}
      * @memberof GM_wrench
-     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebElementPromise.html}
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebElementPromise.html|webdriver.WebElementPromise}
+     * @category selenium-webdriver
      * 
      * @param {!Promise<!Element>} el A promise that will resolve to the promised element.
      */
@@ -414,6 +427,7 @@ const GM_wrench = {};
      * @extends Error
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/error_exports_TimeoutError.html|webdriver.TimeoutError}
+     * @category selenium-webdriver
      *
      * @param {string} [opt_error] The error message, if any.
      */
@@ -428,6 +442,7 @@ const GM_wrench = {};
     /**
      * Checks if a value is a valid locator.
      * @private
+     * @category selenium-webdriver
      * 
      * @param {!(By|function|string|object)} locator The value to check.  If a string, it is returned as a `By.css` value.
      * @return {!(By|function)}                      The valid locator.
@@ -476,6 +491,7 @@ const GM_wrench = {};
     /**
      * Defines common conditions for use with {@link GM_wrench.Waiter}.
      * @namespace
+     * @category selenium-webdriver
      */
     GM_wrench.until = {};
 
@@ -484,6 +500,7 @@ const GM_wrench = {};
      * [webdriver.findElement(by)]{@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#findElement}
      * for information on element locator strategies.
      * @private
+     * @category selenium-webdriver
      *
      * @param {!(By|Function)} locator               The locator to use.
      * @param {!ParentNode} context      The search context.
@@ -514,9 +531,11 @@ const GM_wrench = {};
 
     /**
      * Creates a condition that will loop until an element is found with the given locator.
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/until.html#elementLocated|webdriver.until.elementLocated}
+     * @category selenium-webdriver
      *
      * @param {!(By|Function)} locator The locator to use.
-     * @return {!ElementCondition} The new condition.
+     * @return {!ElementCondition}     The new condition.
      */
     GM_wrench.until.elementLocated = function (locator) {
         locator = checkLocator(locator);
@@ -528,12 +547,14 @@ const GM_wrench = {};
                 return elements[0];
             }
         );
-    }
+    };
 
     /**
      * Creates a condition that will loop until at least one element is found with the given locator.
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/until.html#elementsLocated|webdriver.until.elementsLocated}
+     * @category selenium-webdriver
      *
-     * @param {!(By|Function)} locator                                        The locator to use.
+     * @param {!(By|Function)} locator                                    The locator to use.
      * @return {!Condition<!ParentNode, !(Promise<!ArrayLike<Element>>)>} The new condition.
      */
     GM_wrench.until.elementsLocated = function (locator) {
@@ -546,5 +567,5 @@ const GM_wrench = {};
                 return elements.length > 0 ? elements : null;
             }
         );
-    }
+    };
 })();

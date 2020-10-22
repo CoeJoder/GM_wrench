@@ -362,7 +362,7 @@ var GM_wrench = GM_wrench || {};
     };
 
     /**
-     * @classdesc Defines a condition for use with {@link GM_wrench.wait}.
+     * @classdesc Defines a condition for use with {@link GM_wrench.Waiter}.
      * @class
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_Condition.html|webdriver.Condition}
@@ -386,7 +386,7 @@ var GM_wrench = GM_wrench || {};
     };
 
     /**
-     * @classdesc Defines a condition that will result in an {@link Element}.
+     * @classdesc Defines a condition that will result in an {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element}.
      * @class
      * @extends {Condition}
      * @memberof GM_wrench
@@ -404,7 +404,7 @@ var GM_wrench = GM_wrench || {};
     GM_wrench.ElementCondition = ElementCondition;
 
     /**
-     * @classdesc A promise that will be fulfilled with an Element.
+     * @classdesc A promise that will be fulfilled with an {@link https://developer.mozilla.org/en-US/docs/Web/API/Element|Element}.
      * @class
      * @extends {Element}
      * @implements {Promise<Element>}

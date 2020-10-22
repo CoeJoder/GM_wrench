@@ -192,7 +192,7 @@ Locates elements using a CSS selector.
 <a name="GM_wrench.Condition"></a>
 
 ### GM_wrench.Condition
-Defines a condition for use with [GM_wrench.wait](GM_wrench.wait).
+Defines a condition for use with [Waiter](#GM_wrench.Waiter).
 
 **Category**: selenium-webdriver  
 **See**: [webdriver.Condition](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_Condition.html)  
@@ -217,7 +217,7 @@ Defines a condition for use with [GM_wrench.wait](GM_wrench.wait).
 <a name="GM_wrench.ElementCondition"></a>
 
 ### GM_wrench.ElementCondition ⇐ <code>Condition</code>
-Defines a condition that will result in an [Element](Element).
+Defines a condition that will result in an [Element](https://developer.mozilla.org/en-US/docs/Web/API/Element).
 
 **Extends**: <code>Condition</code>  
 **Category**: selenium-webdriver  
@@ -234,7 +234,7 @@ Defines a condition that will result in an [Element](Element).
 <a name="GM_wrench.ElementPromise"></a>
 
 ### GM_wrench.ElementPromise ⇐ <code>Element</code>
-A promise that will be fulfilled with an Element.
+A promise that will be fulfilled with an [Element](https://developer.mozilla.org/en-US/docs/Web/API/Element).
 
 **Extends**: <code>Element</code>  
 **Implements**: <code>Promise&lt;Element&gt;</code>  

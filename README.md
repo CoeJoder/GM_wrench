@@ -12,7 +12,7 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
 ## API Reference
 **Example**  
 ```js
-(async ({Waiter, until, By}) => {    await new Waiter(document)            .wait(until.elementLocated(By.css("button")));            .click();})(GM_wrench);
+(async ({Waiter, until, By}) => {    await new Waiter(document)            .wait(until.elementLocated(By.css("button")))            .click();})(GM_wrench);
 ```
 
 * [GM_wrench](#GM_wrench)
@@ -27,6 +27,9 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
         * [.By](#GM_wrench.By)
             * [new By(using, value)](#new_GM_wrench.By_new)
             * [.css(selector)](#GM_wrench.By.css) ⇒ <code>By</code>
+            * [.id(id)](#GM_wrench.By.id) ⇒ <code>By</code>
+            * [.className(name)](#GM_wrench.By.className) ⇒ <code>By</code>
+            * [.linkText(text)](#GM_wrench.By.linkText) ⇒ <code>By</code>
         * [.Condition](#GM_wrench.Condition)
             * [new Condition(message, fn)](#new_GM_wrench.Condition_new)
             * [.description()](#GM_wrench.Condition+description) ⇒ <code>string</code>
@@ -133,9 +136,9 @@ Waits for a condition to evaluate to a "truthy" value. The condition may be spec
     }
     await new Waiter("CoeJoder", 10000)
             .wait(isLoggedIn);
-    let button = await new Waiter(document, 3000, 50)
-            .wait(until.elementLocated(By.css('button')));
-    button.click();
+    await new Waiter(document, 3000, 50)
+            .wait(until.elementLocated(By.css('button')))
+            .click();
 })(GM_wrench);
 ```
 <a name="GM_wrench.Waiter+wait"></a>
@@ -166,6 +169,9 @@ Describes a mechanism for locating an element on the page.
 * [.By](#GM_wrench.By)
     * [new By(using, value)](#new_GM_wrench.By_new)
     * [.css(selector)](#GM_wrench.By.css) ⇒ <code>By</code>
+    * [.id(id)](#GM_wrench.By.id) ⇒ <code>By</code>
+    * [.className(name)](#GM_wrench.By.className) ⇒ <code>By</code>
+    * [.linkText(text)](#GM_wrench.By.linkText) ⇒ <code>By</code>
 
 <a name="new_GM_wrench.By_new"></a>
 
@@ -188,6 +194,45 @@ Locates elements using a CSS selector.
 | Param | Type | Description |
 | --- | --- | --- |
 | selector | <code>string</code> | The CSS selector to use. |
+
+<a name="GM_wrench.By.id"></a>
+
+#### By.id(id) ⇒ <code>By</code>
+Locates elements by the ID attribute. This locator uses the CSS selector `*[id="$ID"]`, not `document.getElementById`.
+
+**Returns**: <code>By</code> - The new locator.  
+**Category**: selenium-webdriver  
+**See**: [webdriver.By.id](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.id)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| id | <code>string</code> | The ID to search for. |
+
+<a name="GM_wrench.By.className"></a>
+
+#### By.className(name) ⇒ <code>By</code>
+Locates elements that have a specific class name.
+
+**Returns**: <code>By</code> - The new locator.  
+**Category**: selenium-webdriver  
+**See**: [webdriver.By.className](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.className)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | The class name to search for. |
+
+<a name="GM_wrench.By.linkText"></a>
+
+#### By.linkText(text) ⇒ <code>By</code>
+Locates link elements whose visible text matches the given string.
+
+**Returns**: <code>By</code> - The new locator.  
+**Category**: selenium-webdriver  
+**See**: [webdriver.By.linkText](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.linkText)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| text | <code>string</code> | The link text to search for. |
 
 <a name="GM_wrench.Condition"></a>
 

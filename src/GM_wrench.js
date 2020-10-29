@@ -4,7 +4,7 @@
  * @example
  * (async ({Waiter, until, By}) => {
  *     await new Waiter(document)
- *             .wait(until.elementLocated(By.css("button")));
+ *             .wait(until.elementLocated(By.css("button")))
  *             .click();
  * })(GM_wrench);
  */
@@ -182,9 +182,9 @@ var GM_wrench = GM_wrench || {};
      *     }
      *     await new Waiter("CoeJoder", 10000)
      *             .wait(isLoggedIn);
-     *     let button = await new Waiter(document, 3000, 50)
-     *             .wait(until.elementLocated(By.css('button')));
-     *     button.click();
+     *     await new Waiter(document, 3000, 50)
+     *             .wait(until.elementLocated(By.css('button')))
+     *             .click();
      * })(GM_wrench);
      *
      * @template T,V
@@ -332,6 +332,7 @@ var GM_wrench = GM_wrench || {};
     /**
      * @classdesc Describes a mechanism for locating an element on the page.
      * @class
+     * @hideconstructor
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html|webdriver.By}
      * @category selenium-webdriver
@@ -362,6 +363,46 @@ var GM_wrench = GM_wrench || {};
     };
 
     /**
+     * Locates elements by the ID attribute. This locator uses the CSS selector `*[id="$ID"]`, not `document.getElementById`.
+     * @static
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.id|webdriver.By.id}
+     * @category selenium-webdriver
+     * 
+     * @param {string} id The ID to search for.
+     * @return {!By}      The new locator.
+     */
+    By.id = function (id) {
+        return new By('id', id);
+    };
+
+    /**
+     * Locates elements that have a specific class name.
+     * @static
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.className|webdriver.By.className}
+     * @category selenium-webdriver
+     * 
+     * @param {string} name The class name to search for.
+     * @return {!By}        The new locator.
+     */
+    By.className = function (name) {
+        return new By('className', name);
+    };
+
+    /**
+     * Locates link elements whose visible text matches the given string.
+     * 
+     * @static
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_By.html#By.linkText|webdriver.By.linkText}
+     * @category selenium-webdriver
+     * 
+     * @param {string} text The link text to search for.
+     * @return {!By}        The new locator.
+     */
+    By.linkText = function (text) {
+        return new By('linkText', text);
+    };
+
+    /**
      * @classdesc Defines a condition for use with {@link GM_wrench.Waiter}.
      * @class
      * @memberof GM_wrench
@@ -369,8 +410,8 @@ var GM_wrench = GM_wrench || {};
      * @category selenium-webdriver
      *
      * @template T,V
-     * @param {string}       message A descriptive error message. Should complete the sentence "Waiting [...]".
-     * @param {function(!T): V} fn   The condition function to evaluate on each iteration of the wait loop.
+     * @param {string}          message A descriptive error message. Should complete the sentence "Waiting [...]".
+     * @param {function(!T): V} fn      The condition function to evaluate on each iteration of the wait loop.
      */
     function Condition(message, fn) {
         this.message = message;
@@ -475,15 +516,19 @@ var GM_wrench = GM_wrench || {};
         /**
          * @private
          * 
-         * @param {!ParentNode} context                   The search context.
-         * @param {!string} using                         The name of the location strategy to use.
-         * @param {!string} value                         The value to search for.
-         * @returns {!Promise<!NodeListOf<!Element>>} A promise that will resolve to an array-like collection of Elements.
+         * @param {!ParentNode} context              The search context.
+         * @param {!string} using                    The name of the location strategy to use.
+         * @param {!string} value                    The value to search for.
+         * @returns {!Promise<!ArrayLike<!Element>>} A promise that will resolve to an array-like collection of Elements.
          */
         findElements: async function (context, using, value) {
             switch (using) {
-                case 'css': return context.querySelectorAll(value);
-                default: throw new TypeError('Unrecognized locator type: ' + using);
+                case "css": return context.querySelectorAll(value);
+                case "id": return context.querySelectorAll(`*[id="${value}"]`);
+                case "className": return context.querySelectorAll(`."${value}"`);
+                case "linkText": return [...context.querySelectorAll("a")]
+                        .filter((a) => a.innerText === value);
+                default: throw new TypeError("Unrecognized locator type: " + using);
             }
         }
     };
@@ -502,8 +547,8 @@ var GM_wrench = GM_wrench || {};
      * @private
      * @category selenium-webdriver
      *
-     * @param {!(By|Function)} locator               The locator to use.
-     * @param {!ParentNode} context      The search context.
+     * @param {!(By|Function)} locator           The locator to use.
+     * @param {!ParentNode} context              The search context.
      * @return {!(Promise<!ArrayLike<Element>>)} A promise that will resolve to an array-like collection of Elements.
      */
     async function findElements(locator, context = document) {

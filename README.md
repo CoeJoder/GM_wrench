@@ -12,7 +12,7 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
 ## API Reference
 **Example**  
 ```js
-(async ({Waiter, until, By}) => {    await new Waiter(document)            .wait(until.elementLocated(By.css("button")))            .click();})(GM_wrench);
+(async ({Waiter, until, By}) => {    await new Waiter(document)            .wait(until.elementLocated(By.css('button')))            .click();})(GM_wrench);
 ```
 
 * [GM_wrench](#GM_wrench)
@@ -103,7 +103,7 @@ Detect and handle AJAXed content.  Can force each element to be processed one or
 
 **Example**  
 ```js
-GM_wrench.waitForKeyElements("div.comments", (element) => {  element.innerHTML = "This text inserted by waitForKeyElements().";});GM_wrench.waitForKeyElements(() => {  const iframe = document.querySelector('iframe');  if (iframe) {    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;    return iframeDoc.querySelectorAll("div.comments");  }  return null;}, callbackFunc);
+GM_wrench.waitForKeyElements('div.comments', (element) => {  element.innerHTML = 'This text inserted by waitForKeyElements().';});GM_wrench.waitForKeyElements(() => {  const iframe = document.querySelector('iframe');  if (iframe) {    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;    return iframeDoc.querySelectorAll('div.comments');  }  return null;}, callbackFunc);
 ```
 <a name="GM_wrench.Waiter"></a>
 
@@ -134,7 +134,7 @@ Waits for a condition to evaluate to a "truthy" value. The condition may be spec
     function isLoggedIn(username) {
         return -1 != document.body.innerHTML.search(`Welcome back, ${username}`);
     }
-    await new Waiter("CoeJoder", 10000)
+    await new Waiter('CoeJoder', 10000)
             .wait(isLoggedIn);
     await new Waiter(document, 3000, 50)
             .wait(until.elementLocated(By.css('button')))

@@ -4,7 +4,7 @@
  * @example
  * (async ({Waiter, until, By}) => {
  *     await new Waiter(document)
- *             .wait(until.elementLocated(By.css("button")))
+ *             .wait(until.elementLocated(By.css('button')))
  *             .click();
  * })(GM_wrench);
  */
@@ -70,15 +70,15 @@ var GM_wrench = GM_wrench || {};
      * Detect and handle AJAXed content.  Can force each element to be processed one or more times.
      *
      * @example
-     * GM_wrench.waitForKeyElements("div.comments", (element) => {
-     *   element.innerHTML = "This text inserted by waitForKeyElements().";
+     * GM_wrench.waitForKeyElements('div.comments', (element) => {
+     *   element.innerHTML = 'This text inserted by waitForKeyElements().';
      * });
      *
      * GM_wrench.waitForKeyElements(() => {
      *   const iframe = document.querySelector('iframe');
      *   if (iframe) {
      *     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-     *     return iframeDoc.querySelectorAll("div.comments");
+     *     return iframeDoc.querySelectorAll('div.comments');
      *   }
      *   return null;
      * }, callbackFunc);
@@ -91,23 +91,23 @@ var GM_wrench = GM_wrench || {};
      * @param {number}            [maxIntervals=-1]  The max number of intervals to run (negative number for unlimited).
      */
     GM_wrench.waitForKeyElements = function (selectorOrFunction, callback, waitOnce, interval, maxIntervals) {
-        if (typeof waitOnce === "undefined") {
+        if (typeof waitOnce === 'undefined') {
             waitOnce = true;
         }
-        if (typeof interval === "undefined") {
+        if (typeof interval === 'undefined') {
             interval = 300;
         }
-        if (typeof maxIntervals === "undefined") {
+        if (typeof maxIntervals === 'undefined') {
             maxIntervals = -1;
         }
-        var targetNodes = (typeof selectorOrFunction === "function")
+        var targetNodes = (typeof selectorOrFunction === 'function')
             ? selectorOrFunction()
             : document.querySelectorAll(selectorOrFunction);
 
         var targetsFound = targetNodes && targetNodes.length > 0;
         if (targetsFound) {
             targetNodes.forEach(function (targetNode) {
-                var attrAlreadyFound = "data-userscript-alreadyFound";
+                var attrAlreadyFound = 'data-userscript-alreadyFound';
                 var alreadyFound = targetNode.getAttribute(attrAlreadyFound) || false;
                 if (!alreadyFound) {
                     var cancelFound = callback(targetNode);
@@ -180,7 +180,7 @@ var GM_wrench = GM_wrench || {};
      *     function isLoggedIn(username) {
      *         return -1 != document.body.innerHTML.search(`Welcome back, ${username}`);
      *     }
-     *     await new Waiter("CoeJoder", 10000)
+     *     await new Waiter('CoeJoder', 10000)
      *             .wait(isLoggedIn);
      *     await new Waiter(document, 3000, 50)
      *             .wait(until.elementLocated(By.css('button')))
@@ -523,12 +523,12 @@ var GM_wrench = GM_wrench || {};
          */
         findElements: async function (context, using, value) {
             switch (using) {
-                case "css": return context.querySelectorAll(value);
-                case "id": return context.querySelectorAll(`*[id="${value}"]`);
-                case "className": return context.querySelectorAll(`."${value}"`);
-                case "linkText": return [...context.querySelectorAll("a")]
+                case 'css': return context.querySelectorAll(value);
+                case 'id': return context.querySelectorAll(`*[id="${value}"]`);
+                case 'className': return context.querySelectorAll(`."${value}"`);
+                case 'linkText': return [...context.querySelectorAll('a')]
                         .filter((a) => a.innerText === value);
-                default: throw new TypeError("Unrecognized locator type: " + using);
+                default: throw new TypeError('Unrecognized locator type: ' + using);
             }
         }
     };

@@ -1,11 +1,22 @@
 // @ts-check
 
 /**
- * @example
- * (async ({Waiter, until, By}) => {
- *     await new Waiter(document)
- *             .wait(until.elementLocated(By.css('button')))
- *             .click();
+ * @example <caption>Wait up to 10 seconds to be logged in, then wait up to 3 seconds for a button to appear, then click on it</caption>
+ * (async ({wait, until, By}) => {
+ *     function isLoggedIn(username) {
+ *         return -1 != document.body.innerHTML.search(`Welcome back, ${username}`);
+ *     }
+ *     await wait({
+ *         condition: isLoggedIn,
+ *         input: 'CoeJoder',
+ *         timeout: 10000,
+ *         message: 'Not logged in.'
+ *     });
+ *     await wait({
+ *         condition: until.elementLocated(By.css('button')),
+ *         input: document, 
+ *         timeout: 3000
+ *     }).click();
  * })(GM_wrench);
  */
 var GM_wrench = GM_wrench || {};
@@ -163,7 +174,7 @@ var GM_wrench = GM_wrench || {};
     }
 
     /**
-     * @classdesc Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a
+     * @description Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a
      * {@link GM_wrench.Condition}, as a custom function, or as any promise-like thenable.
      *
      * For a {@link GM_wrench.Condition} or function, the wait will repeatedly evaluate the condition until it returns a truthy
@@ -175,60 +186,39 @@ var GM_wrench = GM_wrench || {};
      * If the provided condition is an {@link GM_wrench.ElementCondition}, then the wait will return a
      * {@link GM_wrench.ElementPromise} that will resolve to the element that satisfied the condition.
      *
-     * @example <caption>Waiting up to 10 seconds for text to appear, then wait up to 3 seconds for an element.</caption>
-     * (async ({Waiter, until, By}) => {
-     *     function isLoggedIn(username) {
-     *         return -1 != document.body.innerHTML.search(`Welcome back, ${username}`);
-     *     }
-     *     await new Waiter('CoeJoder', 10000)
-     *             .wait(isLoggedIn);
-     *     await new Waiter(document, 3000, 50)
-     *             .wait(until.elementLocated(By.css('button')))
-     *             .click();
+     * @example
+     * (async ({wait, until, By}) => {
+     *     await wait({
+     *         condition: until.elementLocated(By.css('button')),
+     *         input: document
+     *     }).click();
      * })(GM_wrench);
-     *
+     * 
      * @template T,V
-     * @class
      * @memberof GM_wrench
+     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#wait|webdriver.wait}
      * @see {@link https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html|webdriver.FluentWait}
      * @category selenium-webdriver
      *
-     * @param {T}                 [input]             The input value to pass to the evaluated conditions. 
-     * @param {number}            [timeout=0]         The duration in milliseconds, how long to wait for the condition to be true.
-     * @param {number}            [pollTimeout=200]   The duration in milliseconds, how long to wait between polling the condition.
-     * @param {(string|Function)} [message=undefined] An optional message to use if the wait times out.
-     */
-    function Waiter(input = undefined, timeout = 0, pollTimeout = 200, message = undefined) {
-        this.input = input;
-        this.timeout = timeout;
-        this.pollTimeout = pollTimeout;
-        this.message = message;
-    }
-    GM_wrench.Waiter = Waiter;
-
-    /**
-     * Wait for condition to be satisfied.
-     * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#wait|webdriver.wait}
-     * @category selenium-webdriver
-     *
-     * @param {!(PromiseLike<V>|Condition<T, V>|function(T): V)} condition The condition to wait on, defined as a promise,
-     *      {@link GM_wrench.Condition} object, or a function to evaluate as a condition.
+     * @param {Object}            [obj]                   An object.
+     * @param {!(PromiseLike<V>|Condition<T, V>|function(T): V)}
+     *                            [obj.condition]         The condition to wait on, defined as a promise, {@link GM_wrench.Condition} object, 
+     *      or a function to evaluate as a condition.
+     * @param {T}                 [obj.input]             The input value to pass to the evaluated conditions. 
+     * @param {number}            [obj.timeout=0]         The duration in milliseconds, how long to wait for the condition to be true.
+     * @param {number}            [obj.pollTimeout=200]   The duration in milliseconds, how long to wait between polling the condition.
+     * @param {(string|Function)} [obj.message]           An optional message to use if the wait times out.
      * @return {!(Promise<V>|ElementPromise)} A promise that will be resolved with the first truthy value returned
      *      by the condition function, or rejected if the condition times out. If the input input condition is an
      *      instance of an {@link GM_wrench.ElementCondition}, the returned value will be an {@link GM_wrench.ElementPromise}.
      * @throws {TypeError} if the provided `condition` is not a valid type.
      */
-    Waiter.prototype.wait = function (condition) {
-        let input = this.input;
-        let timeout = this.timeout;
-        let message = this.message;
-        let pollTimeout = this.pollTimeout;
-
+    GM_wrench.wait = function ({condition, input = undefined, timeout = 0, pollTimeout = 200, message = undefined} = {}) {
         if (typeof timeout !== 'number' || timeout < 0) {
-            throw TypeError('timeout must be a number >= 0: ' + timeout);
+            throw new TypeError('timeout must be a number >= 0: ' + timeout);
         }
         if (typeof pollTimeout !== 'number' || pollTimeout < 0) {
-            throw TypeError('pollTimeout must be a number >= 0: ' + pollTimeout);
+            throw new TypeError('pollTimeout must be a number >= 0: ' + pollTimeout);
         }
 
         if (isPromise(condition)) {
@@ -272,7 +262,7 @@ var GM_wrench = GM_wrench || {};
             fn = condition;
         }
         else {
-            throw TypeError('Wait condition must be a promise-like object, function, or a Condition object');
+            throw new TypeError('Wait condition must be a promise-like object, function, or a Condition object');
         }
 
         function evaluateCondition() {
@@ -308,7 +298,7 @@ var GM_wrench = GM_wrench || {};
         if (condition instanceof ElementCondition) {
             return new ElementPromise(pResult.then(function (value) {
                 if (!(value instanceof Element)) {
-                    throw TypeError('ElementCondition did not resolve to a Element: ' + Object.prototype.toString.call(value));
+                    throw new TypeError('ElementCondition did not resolve to a Element: ' + Object.prototype.toString.call(value));
                 }
                 return value;
             }));
@@ -403,7 +393,7 @@ var GM_wrench = GM_wrench || {};
     };
 
     /**
-     * @classdesc Defines a condition for use with {@link GM_wrench.Waiter}.
+     * @classdesc Defines a condition for use with {@link GM_wrench.wait}.
      * @class
      * @memberof GM_wrench
      * @see {@link https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_Condition.html|webdriver.Condition}
@@ -473,11 +463,22 @@ var GM_wrench = GM_wrench || {};
      * @param {string} [opt_error] The error message, if any.
      */
     function TimeoutError(opt_error) {
-        Error.call(this, opt_error);
-        this.message = opt_error;
+        const instance = Reflect.construct(Error, [opt_error]);
+        Reflect.setPrototypeOf(instance, Reflect.getPrototypeOf(this));
+        return instance;
     }
-    inheritType(TimeoutError, Error);
-    TimeoutError.prototype.name = TimeoutError.name;
+    TimeoutError.prototype = Object.create(Error.prototype, {
+        constructor: {
+            value: Error,
+            enumerable: false,
+            writeable: true,
+            configurable: true
+        }
+    });
+    Reflect.setPrototypeOf(TimeoutError, Error);
+    TimeoutError.prototype.name = 'TimeoutError';
+    // prevent display of setTimeout call chains
+    TimeoutError.prototype.stack = '';
     GM_wrench.TimeoutError = TimeoutError;
 
     /**
@@ -534,7 +535,7 @@ var GM_wrench = GM_wrench || {};
     };
 
     /**
-     * Defines common conditions for use with {@link GM_wrench.Waiter}.
+     * Defines common conditions for use with {@link GM_wrench.wait}.
      * @namespace
      * @category selenium-webdriver
      */

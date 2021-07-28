@@ -5,7 +5,7 @@ A collection of helper functions and classes for userscripts.  Includes a subset
 ## Installation
 Add the following to your userscript's metadata block:
 ```js
-// @require https://cdn.jsdelivr.net/gh/CoeJoder/GM_wrench@v1.1/dist/GM_wrench.min.js
+// @require https://cdn.jsdelivr.net/gh/CoeJoder/GM_wrench@v1.2/dist/GM_wrench.min.js
 ```
 If your userscript was already installed, you'll have to reinstall it to pickup the change. See [documentation](https://sourceforge.net/p/greasemonkey/wiki/Metadata_Block/#require).
 

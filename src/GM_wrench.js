@@ -258,7 +258,7 @@ var GM_wrench = GM_wrench || {};
             message = message || condition.description();
             fn = condition.fn;
         }
-        else if (typeof fn === 'function') {
+        else if (typeof condition === 'function') {
             fn = condition;
         }
         else {

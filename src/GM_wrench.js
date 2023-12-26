@@ -78,13 +78,13 @@ var GM_wrench = GM_wrench || {};
     };
 
 	/**
-     * Check whether or not a given CSS selector is supported by the current browser.
-     * 
-     * @param {string} selector The CSS selector.
-     * @returns {boolean} Whether or not the selector is supported by the current browser.
-     */
-	GM_wrench.isCssSelectorSupported = function(selector) {
-	    const style = document.createElement('style');
+	 * Check whether or not a given CSS selector is supported by the current browser.
+	 * 
+	 * @param {string} selector The CSS selector.
+	 * @returns {boolean} Whether or not the selector is supported by the current browser.
+	 */
+	GM_wrench.isCssSelectorSupported = function (selector) {
+		const style = document.createElement('style');
 		document.head.appendChild(style);
 		try {
 			style.sheet?.insertRule(selector + '{}', 0);
@@ -95,7 +95,7 @@ var GM_wrench = GM_wrench || {};
 		}
 		return true;
 	};
-    
+
     /**
      * Detect and handle AJAXed content.  Can force each element to be processed one or more times.
      *

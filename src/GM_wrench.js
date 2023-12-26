@@ -76,6 +76,25 @@ var GM_wrench = GM_wrench || {};
         link.href = href;
         document.getElementsByTagName('head')[0].appendChild(link);
     };
+
+	/**
+     * Check whether or not a given CSS selector is supported by the current browser.
+     * 
+     * @param {string} selector The CSS selector.
+     * @returns {boolean} Whether or not the selector is supported by the current browser.
+     */
+	GM_wrench.isCssSelectorSupported = function(selector) {
+	    const style = document.createElement('style');
+		document.head.appendChild(style);
+		try {
+			style.sheet?.insertRule(selector + '{}', 0);
+		} catch (e) {
+			return false;
+		} finally {
+			document.head.removeChild(style);
+		}
+		return true;
+	};
     
     /**
      * Detect and handle AJAXed content.  Can force each element to be processed one or more times.
@@ -229,7 +248,7 @@ var GM_wrench = GM_wrench || {};
                     return;
                 }
                 let start = Date.now();
-                let timer = setTimeout(function () {
+                let timer = /** @type {NodeJS.Timeout | null} */ (setTimeout(function () {
                     timer = null
                     try {
                         let timeoutMessage = resolveWaitMessage(message);
@@ -237,7 +256,7 @@ var GM_wrench = GM_wrench || {};
                     } catch (ex) {
                         reject(new TimeoutError(`${ex.message}\nTimed out waiting for promise to resolve after ${Date.now() - start}ms`));
                     }
-                }, timeout);
+                }, timeout));
                 const clearTimer = () => timer && clearTimeout(timer);
 
                 pCondition.then(
@@ -601,7 +620,7 @@ var GM_wrench = GM_wrench || {};
      * @category selenium-webdriver
      *
      * @param {!(By|Function)} locator                                    The locator to use.
-     * @return {!Condition<!ParentNode, !(Promise<!ArrayLike<Element>>)>} The new condition.
+     * @return {!Condition<!ParentNode, !(Promise<?ArrayLike<Element>>)>} The new condition.
      */
     GM_wrench.until.elementsLocated = function (locator) {
         locator = checkLocator(locator);

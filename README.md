@@ -34,6 +34,7 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
     * [.sleep(ms)](#GM_wrench.sleep) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.addCss(css)](#GM_wrench.addCss)
     * [.addStylesheet(href)](#GM_wrench.addStylesheet)
+    * [.isCssSelectorSupported(selector)](#GM_wrench.isCssSelectorSupported) ⇒ <code>boolean</code>
     * [.waitForKeyElements(selectorOrFunction, callback, [waitOnce], [interval], [maxIntervals])](#GM_wrench.waitForKeyElements)
     * _selenium-webdriver_
         * [.wait([obj])](#GM_wrench.wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code>
@@ -54,7 +55,7 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
             * [new TimeoutError([opt_error])](#new_GM_wrench.TimeoutError_new)
         * [.until](#GM_wrench.until) : <code>object</code>
             * [.elementLocated(locator)](#GM_wrench.until.elementLocated) ⇒ <code>ElementCondition</code>
-            * [.elementsLocated(locator)](#GM_wrench.until.elementsLocated) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;!ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
+            * [.elementsLocated(locator)](#GM_wrench.until.elementsLocated) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;?ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
 
 <a name="GM_wrench.sleep"></a>
 
@@ -84,7 +85,11 @@ Add a new `<style>` with the given text to the `<head>`.
 
 **Example**  
 ```js
-GM_wrench.addCss(`    p {        height: 50px;    }`);
+GM_wrench.addCss(`
+    p {
+        height: 50px;
+    }
+`);
 ```
 <a name="GM_wrench.addStylesheet"></a>
 
@@ -100,6 +105,17 @@ Add a new stylesheet `<link>` to the `<head>`.
 ```js
 GM_wrench.addStylesheet('https://fonts.googleapis.com/css?family=Open+Sans');
 ```
+<a name="GM_wrench.isCssSelectorSupported"></a>
+
+### GM_wrench.isCssSelectorSupported(selector) ⇒ <code>boolean</code>
+Check whether or not a given CSS selector is supported by the current browser.
+
+**Returns**: <code>boolean</code> - Whether or not the selector is supported by the current browser.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| selector | <code>string</code> | The CSS selector. |
+
 <a name="GM_wrench.waitForKeyElements"></a>
 
 ### GM_wrench.waitForKeyElements(selectorOrFunction, callback, [waitOnce], [interval], [maxIntervals])
@@ -116,14 +132,37 @@ Detect and handle AJAXed content.  Can force each element to be processed one or
 
 **Example**  
 ```js
-GM_wrench.waitForKeyElements('div.comments', (element) => {  element.innerHTML = 'This text inserted by waitForKeyElements().';});GM_wrench.waitForKeyElements(() => {  const iframe = document.querySelector('iframe');  if (iframe) {    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;    return iframeDoc.querySelectorAll('div.comments');  }  return null;}, callbackFunc);
+GM_wrench.waitForKeyElements('div.comments', (element) => {
+  element.innerHTML = 'This text inserted by waitForKeyElements().';
+});
+
+GM_wrench.waitForKeyElements(() => {
+  const iframe = document.querySelector('iframe');
+  if (iframe) {
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    return iframeDoc.querySelectorAll('div.comments');
+  }
+  return null;
+}, callbackFunc);
 ```
 <a name="GM_wrench.wait"></a>
 
 ### GM_wrench.wait([obj]) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code>
-Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a[Condition](#GM_wrench.Condition), as a custom function, or as any promise-like thenable.For a [Condition](#GM_wrench.Condition) or function, the wait will repeatedly evaluate the condition until it returns a truthyvalue. If any errors occur while evaluating the condition, they will be allowed to propagate. In the event acondition returns a Promise, the polling loop will wait for it to be resolved and use the resolved value forwhether the condition has been satisfied. The resolution time for a promise is always factored into whether await has timed out.If the provided condition is an [ElementCondition](#GM_wrench.ElementCondition), then the wait will return a[ElementPromise](#GM_wrench.ElementPromise) that will resolve to the element that satisfied the condition.
+Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a
+[Condition](#GM_wrench.Condition), as a custom function, or as any promise-like thenable.
 
-**Returns**: <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code> - A promise that will be resolved with the first truthy value returned     by the condition function, or rejected if the condition times out. If the input input condition is an     instance of an [ElementCondition](#GM_wrench.ElementCondition), the returned value will be an [ElementPromise](#GM_wrench.ElementPromise).  
+For a [Condition](#GM_wrench.Condition) or function, the wait will repeatedly evaluate the condition until it returns a truthy
+value. If any errors occur while evaluating the condition, they will be allowed to propagate. In the event a
+condition returns a Promise, the polling loop will wait for it to be resolved and use the resolved value for
+whether the condition has been satisfied. The resolution time for a promise is always factored into whether a
+wait has timed out.
+
+If the provided condition is an [ElementCondition](#GM_wrench.ElementCondition), then the wait will return a
+[ElementPromise](#GM_wrench.ElementPromise) that will resolve to the element that satisfied the condition.
+
+**Returns**: <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code> - A promise that will be resolved with the first truthy value returned
+     by the condition function, or rejected if the condition times out. If the input input condition is an
+     instance of an [ElementCondition](#GM_wrench.ElementCondition), the returned value will be an [ElementPromise](#GM_wrench.ElementPromise).  
 **Category**: selenium-webdriver  
 **Throws**:
 
@@ -146,7 +185,12 @@ Waits for a condition to evaluate to a "truthy" value. The condition may be spec
 
 **Example**  
 ```js
-(async ({wait, until, By}) => {    await wait({        condition: until.elementLocated(By.css('button')),        input: document    }).click();})(GM_wrench);
+(async ({wait, until, By}) => {
+    await wait({
+        condition: until.elementLocated(By.css('button')),
+        input: document
+    }).click();
+})(GM_wrench);
 ```
 <a name="GM_wrench.By"></a>
 
@@ -308,7 +352,7 @@ Defines common conditions for use with [wait](#GM_wrench.wait).
 
 * [.until](#GM_wrench.until) : <code>object</code>
     * [.elementLocated(locator)](#GM_wrench.until.elementLocated) ⇒ <code>ElementCondition</code>
-    * [.elementsLocated(locator)](#GM_wrench.until.elementsLocated) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;!ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
+    * [.elementsLocated(locator)](#GM_wrench.until.elementsLocated) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;?ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
 
 <a name="GM_wrench.until.elementLocated"></a>
 
@@ -325,10 +369,10 @@ Creates a condition that will loop until an element is found with the given loca
 
 <a name="GM_wrench.until.elementsLocated"></a>
 
-#### until.elementsLocated(locator) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;!ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
+#### until.elementsLocated(locator) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;?ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
 Creates a condition that will loop until at least one element is found with the given locator.
 
-**Returns**: <code>Condition.&lt;!ParentNode, !(Promise.&lt;!ArrayLike.&lt;Element&gt;&gt;)&gt;</code> - The new condition.  
+**Returns**: <code>Condition.&lt;!ParentNode, !(Promise.&lt;?ArrayLike.&lt;Element&gt;&gt;)&gt;</code> - The new condition.  
 **Category**: selenium-webdriver  
 **See**: [webdriver.until.elementsLocated](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/lib/until.html#elementsLocated)  
 

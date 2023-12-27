@@ -116,6 +116,12 @@ Check whether or not a given CSS selector is supported by the current browser.
 | --- | --- | --- |
 | selector | <code>string</code> | The CSS selector. |
 
+**Example**  
+```js
+if (!GM_wrench.isCssSelectorSupported(':has(x)')) {
+    throw new Error("Browser does not support the ':has(x)' pseudo-selector");
+}
+```
 <a name="GM_wrench.waitForKeyElements"></a>
 
 ### GM_wrench.waitForKeyElements(selectorOrFunction, callback, [waitOnce], [interval], [maxIntervals])

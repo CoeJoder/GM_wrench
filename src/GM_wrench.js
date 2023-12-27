@@ -80,6 +80,11 @@ var GM_wrench = GM_wrench || {};
 	/**
 	 * Check whether or not a given CSS selector is supported by the current browser.
 	 * 
+	 * @example
+	 * if (!GM_wrench.isCssSelectorSupported(':has(x)')) {
+	 *     throw new Error("Browser does not support the ':has(x)' pseudo-selector");
+	 * }
+	 * 
 	 * @param {string} selector The CSS selector.
 	 * @returns {boolean} Whether or not the selector is supported by the current browser.
 	 */

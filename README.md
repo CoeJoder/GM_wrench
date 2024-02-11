@@ -1,6 +1,6 @@
 # GM_wrench
 Greasemonkey Wrench.<br/>
-A collection of helper functions and classes for userscripts.  Includes a subset of the [selenium-webdriver](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/) API.
+A collection of helper functions and classes for userscripts.  Includes a subset of the [selenium-webdriver](https://github.com/SeleniumHQ/selenium/tree/trunk/javascript/node/selenium-webdriver#readme) API.
 
 ## Installation
 Add the following to your userscript's metadata block:

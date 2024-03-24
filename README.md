@@ -1,6 +1,6 @@
 # GM_wrench
 Greasemonkey Wrench.<br/>
-A collection of helper functions and classes for userscripts.  Includes a subset of the [selenium-webdriver](https://github.com/SeleniumHQ/selenium/tree/trunk/javascript/node/selenium-webdriver#readme) API.
+A collection of helper functions and classes for userscripts.  Includes a subset of the [selenium-webdriver](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/) API.
 
 ## Installation
 Add the following to your userscript's metadata block:
@@ -31,13 +31,14 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
 ```
 
 * [GM_wrench](#GM_wrench)
+    * [.Logger](#GM_wrench.Logger)
+        * [new Logger([opts])](#new_GM_wrench.Logger_new)
     * [.sleep(ms)](#GM_wrench.sleep) ⇒ <code>Promise.&lt;void&gt;</code>
     * [.addCss(css)](#GM_wrench.addCss)
     * [.addStylesheet(href)](#GM_wrench.addStylesheet)
     * [.isCssSelectorSupported(selector)](#GM_wrench.isCssSelectorSupported) ⇒ <code>boolean</code>
     * [.waitForKeyElements(selectorOrFunction, callback, [waitOnce], [interval], [maxIntervals])](#GM_wrench.waitForKeyElements)
     * _selenium-webdriver_
-        * [.wait([obj])](#GM_wrench.wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code>
         * [.By](#GM_wrench.By)
             * [new By(using, value)](#new_GM_wrench.By_new)
             * [.css(selector)](#GM_wrench.By.css) ⇒ <code>By</code>
@@ -56,7 +57,31 @@ If your userscript was already installed, you'll have to reinstall it to pickup 
         * [.until](#GM_wrench.until) : <code>object</code>
             * [.elementLocated(locator)](#GM_wrench.until.elementLocated) ⇒ <code>ElementCondition</code>
             * [.elementsLocated(locator)](#GM_wrench.until.elementsLocated) ⇒ <code>Condition.&lt;!ParentNode, !(Promise.&lt;?ArrayLike.&lt;Element&gt;&gt;)&gt;</code>
+        * [.wait([obj])](#GM_wrench.wait) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code>
 
+<a name="GM_wrench.Logger"></a>
+
+### GM_wrench.Logger
+A console logger which can change log-level via the GM menu.
+
+<a name="new_GM_wrench.Logger_new"></a>
+
+#### new Logger([opts])
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [opts] | <code>Object</code> |  | An object. |
+| [opts.level] | <code>string</code> | <code>&quot;info&quot;</code> | The log-level.  Options: trace, debug, info, warn, error, fatal |
+| [opts.prefix] | <code>string</code> \| <code>null</code> | <code>&quot;(script name)&quot;</code> | The log message prefix. |
+| [opts.registerMenu] | <code>boolean</code> | <code>true</code> | Whether or not to register a log-level changer in the GM menu. |
+| [opts.menuLabels] | <code>Array.&lt;string&gt;</code> | <code>[&quot;trace&quot;, &quot;debug&quot;, &quot;info&quot;]</code> | The log-levels to show in the GM menu. |
+| [opts.formatter] | <code>function</code> |  | The log message formatter. |
+
+**Example**  
+```js
+const logger = new GM_wrench.Logger();
+logger.info("userscript loaded");
+```
 <a name="GM_wrench.sleep"></a>
 
 ### GM_wrench.sleep(ms) ⇒ <code>Promise.&lt;void&gt;</code>
@@ -150,53 +175,6 @@ GM_wrench.waitForKeyElements(() => {
   }
   return null;
 }, callbackFunc);
-```
-<a name="GM_wrench.wait"></a>
-
-### GM_wrench.wait([obj]) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code>
-Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a
-[Condition](#GM_wrench.Condition), as a custom function, or as any promise-like thenable.
-
-For a [Condition](#GM_wrench.Condition) or function, the wait will repeatedly evaluate the condition until it returns a truthy
-value. If any errors occur while evaluating the condition, they will be allowed to propagate. In the event a
-condition returns a Promise, the polling loop will wait for it to be resolved and use the resolved value for
-whether the condition has been satisfied. The resolution time for a promise is always factored into whether a
-wait has timed out.
-
-If the provided condition is an [ElementCondition](#GM_wrench.ElementCondition), then the wait will return a
-[ElementPromise](#GM_wrench.ElementPromise) that will resolve to the element that satisfied the condition.
-
-**Returns**: <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code> - A promise that will be resolved with the first truthy value returned
-     by the condition function, or rejected if the condition times out. If the input input condition is an
-     instance of an [ElementCondition](#GM_wrench.ElementCondition), the returned value will be an [ElementPromise](#GM_wrench.ElementPromise).  
-**Category**: selenium-webdriver  
-**Throws**:
-
-- <code>TypeError</code> if the provided `condition` is not a valid type.
-
-**See**
-
-- [webdriver.wait](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#wait)
-- [webdriver.FluentWait](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html)
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| [obj] | <code>Object</code> |  | An object. |
-| [obj.condition] | <code>PromiseLike.&lt;V&gt;</code> \| <code>Condition.&lt;T, V&gt;</code> \| <code>function</code> |  | The condition to wait on, defined as a promise, [Condition](#GM_wrench.Condition) object,       or a function to evaluate as a condition. |
-| [obj.input] | <code>T</code> |  | The input value to pass to the evaluated conditions. |
-| [obj.timeout] | <code>number</code> | <code>0</code> | The duration in milliseconds, how long to wait for the condition to be true. |
-| [obj.pollTimeout] | <code>number</code> | <code>200</code> | The duration in milliseconds, how long to wait between polling the condition. |
-| [obj.message] | <code>string</code> \| <code>function</code> |  | An optional message to use if the wait times out. |
-
-**Example**  
-```js
-(async ({wait, until, By}) => {
-    await wait({
-        condition: until.elementLocated(By.css('button')),
-        input: document
-    }).click();
-})(GM_wrench);
 ```
 <a name="GM_wrench.By"></a>
 
@@ -386,3 +364,50 @@ Creates a condition that will loop until at least one element is found with the 
 | --- | --- | --- |
 | locator | <code>By</code> \| <code>function</code> | The locator to use. |
 
+<a name="GM_wrench.wait"></a>
+
+### GM_wrench.wait([obj]) ⇒ <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code>
+Waits for a condition to evaluate to a "truthy" value. The condition may be specified by a
+[Condition](#GM_wrench.Condition), as a custom function, or as any promise-like thenable.
+
+For a [Condition](#GM_wrench.Condition) or function, the wait will repeatedly evaluate the condition until it returns a truthy
+value. If any errors occur while evaluating the condition, they will be allowed to propagate. In the event a
+condition returns a Promise, the polling loop will wait for it to be resolved and use the resolved value for
+whether the condition has been satisfied. The resolution time for a promise is always factored into whether a
+wait has timed out.
+
+If the provided condition is an [ElementCondition](#GM_wrench.ElementCondition), then the wait will return a
+[ElementPromise](#GM_wrench.ElementPromise) that will resolve to the element that satisfied the condition.
+
+**Returns**: <code>Promise.&lt;V&gt;</code> \| <code>ElementPromise</code> - A promise that will be resolved with the first truthy value returned
+     by the condition function, or rejected if the condition times out. If the input input condition is an
+     instance of an [ElementCondition](#GM_wrench.ElementCondition), the returned value will be an [ElementPromise](#GM_wrench.ElementPromise).  
+**Category**: selenium-webdriver  
+**Throws**:
+
+- <code>TypeError</code> if the provided `condition` is not a valid type.
+
+**See**
+
+- [webdriver.wait](https://www.selenium.dev/selenium/docs/api/javascript/module/selenium-webdriver/index_exports_WebDriver.html#wait)
+- [webdriver.FluentWait](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html)
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [obj] | <code>Object</code> |  | An object. |
+| [obj.condition] | <code>PromiseLike.&lt;V&gt;</code> \| <code>Condition.&lt;T, V&gt;</code> \| <code>function</code> |  | The condition to wait on, defined as a promise, [Condition](#GM_wrench.Condition) object,      or a function to evaluate as a condition. |
+| [obj.input] | <code>T</code> |  | The input value to pass to the evaluated conditions. |
+| [obj.timeout] | <code>number</code> | <code>0</code> | The duration in milliseconds, how long to wait for the condition to be true. |
+| [obj.pollTimeout] | <code>number</code> | <code>200</code> | The duration in milliseconds, how long to wait between polling the condition. |
+| [obj.message] | <code>string</code> \| <code>function</code> |  | An optional message to use if the wait times out. |
+
+**Example**  
+```js
+(async ({wait, until, By}) => {
+    await wait({
+        condition: until.elementLocated(By.css('button')),
+        input: document
+    }).click();
+})(GM_wrench);
+```
